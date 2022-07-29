@@ -57,7 +57,7 @@ $ docker-compose up -d
 $ docker-compose logs -f
 ```
 
-* After waiting for enough time, you will see the results of containers.
+* After waiting for enough time, open a web browser and visit http://localhost:9000 (Tested on Chrome)
 
 ### <a name="dev-mode"></a>**Development Mode: VS Code Remote - Containers**
 
@@ -74,6 +74,7 @@ Then, follow these steps:
     <br>
     **Note:** Maybe you must kill existing running service processes by terminal.
 * Then, you can keep track of other services with docker logs.
+* Then, open a web browser and visit http://localhost:9000 (Tested on Chrome)
 
 <br>
 
