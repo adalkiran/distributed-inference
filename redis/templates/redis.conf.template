@@ -1,0 +1,11 @@
+#See: https://linuxhint.com/modify-redis-configuration-file/
+
+requirepass ${REDIS_PASSWORD}
+port ${REDIS_PORT}
+dir /data
+
+save 900 1
+save 300 10
+save 60 10000
+
+#stream-node-max-bytes

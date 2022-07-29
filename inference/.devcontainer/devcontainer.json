@@ -1,0 +1,23 @@
+// See: https://code.visualstudio.com/docs/remote/containers-advanced#_connecting-to-multiple-containers-at-once
+
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.195.0/containers/javascript-node
+{
+	"name": "Inference Container - Distributed Inference Pipeline",
+
+	"dockerComposeFile": ["../../docker-compose.yml", "../../docker-compose.dev.yml"],
+	"service": "inference",
+	"shutdownAction": "none",
+
+
+	"workspaceFolder": "/workspace",
+
+	// Set *default* container specific settings.json values on container create.
+	"settings": {
+	},
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"ms-python.python"
+	]
+}

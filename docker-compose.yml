@@ -1,0 +1,101 @@
+version: '3'
+services:
+  web:
+    image: nginx
+    volumes:
+    - ./web/templates:/etc/nginx/templates
+    ports:
+    - "${WEB_HTTP_PORT}:80"
+    environment:
+    - NGINX_HOST=localhost
+    - NGINX_PORT=80
+
+  redis:
+    image: distributed-inference/redis
+    build:
+      context: redis # Dockerfile location
+      args:
+        # See for available variants: https://hub.docker.com/_/redis?tab=tags
+        - VARIANT:7.0.1-bullseye
+    volumes:
+      - "./redis/templates:/templates:cached"
+      - "./redis/data:/data"
+    environment:
+    - REDIS_PORT
+    - REDIS_PASSWORD
+
+  ui:
+    image: distributed-inference/ui
+    build:
+      context: ui # Dockerfile location
+      args:
+        # See for available variants: https://github.com/microsoft/vscode-dev-containers/tree/main/containers/typescript-node
+        - VARIANT:18-bullseye
+    environment:
+      - WEB_HTTP_PORT
+    volumes:
+      # Mount the root folder that contains .git
+      - "./ui:/workspace:cached"
+
+  signaling:
+    image: distributed-inference/signaling
+    build:
+      context: signaling # Dockerfile location
+      args:
+        # See for available variants: https://hub.docker.com/_/golang?tab=tags
+        - VARIANT:1.18.3-bullseye
+    # See: https://code.visualstudio.com/docs/remote/create-dev-container#_set-up-a-folder-to-run-in-a-container
+    # [Optional] Required for ptrace-based debuggers like C++, Go, and Rust
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      # Mount the root folder that contains .git
+      - "./signaling:/workspace:cached"
+    environment:
+    - REDIS_HOST
+    - REDIS_PORT
+    - REDIS_PASSWORD
+
+  mediabridge:
+    image: distributed-inference/mediabridge
+    build:
+      context: mediabridge # Dockerfile location
+      args:
+        # See for available variants: https://hub.docker.com/_/golang?tab=tags
+        - VARIANT:1.18.3-bullseye
+    # See: https://code.visualstudio.com/docs/remote/create-dev-container#_set-up-a-folder-to-run-in-a-container
+    # [Optional] Required for ptrace-based debuggers like C++, Go, and Rust
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      # Mount the root folder that contains .git
+      - "./mediabridge:/workspace:cached"
+    ports:
+    - "${MEDIABRIDGE_UDP_PORT}:${MEDIABRIDGE_UDP_PORT}/udp"
+    environment:
+    - REDIS_HOST
+    - REDIS_PORT
+    - REDIS_PASSWORD
+    - MEDIABRIDGE_DOCKER_HOST_IP
+    - MEDIABRIDGE_UDP_PORT
+    deploy:
+      replicas: 1
+      
+
+  inference:
+    image: distributed-inference/inference
+    build:
+      context: inference # Dockerfile location
+    volumes:
+      - "./inference:/workspace:cached"
+    environment:
+    - PYTHONUNBUFFERED="1"
+    - REDIS_HOST
+    - REDIS_PORT
+    - REDIS_PASSWORD
+    deploy:
+      replicas: 1

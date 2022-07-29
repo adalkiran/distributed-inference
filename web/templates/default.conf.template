@@ -1,0 +1,39 @@
+resolver 127.0.0.11 ipv6=off valid=40s;  # The DNS IP server
+
+server {
+    listen       ${NGINX_PORT};
+    listen  [::]:${NGINX_PORT};
+    server_name  ${NGINX_HOST};
+
+    #access_log  /var/log/nginx/host.access.log  main;
+
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    location / {
+        set $ui_server_name ui;
+        set $ui_server_port 80;
+        proxy_pass http://$ui_server_name:$ui_server_port;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+
+    location /signaling {
+        set $signaling_server_name signaling;
+        set $signaling_server_port 80;
+
+        proxy_pass http://$signaling_server_name:$signaling_server_port/ws$1;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}

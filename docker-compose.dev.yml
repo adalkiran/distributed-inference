@@ -1,0 +1,10 @@
+version: '3'
+#services:
+#  signaling:
+#    entrypoint: /entrypoint-dev.sh
+
+#  mediabridge:
+#    entrypoint: /entrypoint-dev.sh
+
+ # inference:
+#    entrypoint: /entrypoint-dev.sh

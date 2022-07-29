@@ -1,0 +1,20 @@
+body {
+    background: gray;
+}
+  
+.container{
+    position: relative;
+    display: grid;
+    grid-template:"container";
+  
+    margin: 20px;
+}
+.box{
+    grid-area: container;
+    place-self: start;
+    top: 0;
+    left: 0;
+}
+.stack-top{
+    z-index: 9;
+}
