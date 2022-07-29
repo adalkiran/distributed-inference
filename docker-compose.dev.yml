@@ -1,10 +1,12 @@
 version: '3'
-#services:
+services:
 #  signaling:
 #    entrypoint: /entrypoint-dev.sh
 
 #  mediabridge:
 #    entrypoint: /entrypoint-dev.sh
 
- # inference:
+  inference:
 #    entrypoint: /entrypoint-dev.sh
+    deploy:
+      replicas: 1

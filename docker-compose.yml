@@ -98,4 +98,4 @@ services:
     - REDIS_PORT
     - REDIS_PASSWORD
     deploy:
-      replicas: 1
+      replicas: 5

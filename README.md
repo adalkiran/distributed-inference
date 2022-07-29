@@ -37,7 +37,7 @@ Docker Compose file creates some containers, with some replica instances:
 
 * **inference:** The service will register itself to the orchestrator, and can keep track of "images" Redis Stream which streams JPEG image data of video frames. Written in Python language. It makes inferences on incoming images with YOLOX model for object detection.
     <br>
-    Can be more than one, by docker-compose.yml file's replica values.
+    Can be more than one, by docker-compose.yml file's replica values, default is 5.
 
 * **ui:** The web frontend. It gets a media stream from webcam and forwards it to assigned mediabridge service via WebRTC.
 
