@@ -125,6 +125,9 @@ class RTC {
     }
 
     createLocalTracks(): Promise<MediaStream> {
+        if (!navigator.mediaDevices) {
+            throw new Error("You are trying to access a remote web app using HTTP. Browsers does not allow using WebRTC while connecting not secure HTTP. Please try connecting the web app with HTTPS instead.");
+        }
         return navigator.mediaDevices.getUserMedia({
             video: {
                 height: 720,
@@ -320,7 +323,8 @@ class Signaling {
                 boxH);
             signaling.canvasCtx.stroke();
             const metrics = signaling.canvasCtx.measureText("A");
-            const fontHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
+            console.log("metrics", metrics)
+            const fontHeight = (metrics.fontBoundingBoxAscent || metrics.actualBoundingBoxAscent * 1.5) + (metrics.fontBoundingBoxDescent || metrics.actualBoundingBoxDescent * 1.5);
 
             for (let i = 0; i < textLines.length; i++) {
                 signaling.canvasCtx.fillText(textLines[i], boxX, boxY + ((i + 1) * fontHeight));
