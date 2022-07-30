@@ -323,7 +323,6 @@ class Signaling {
                 boxH);
             signaling.canvasCtx.stroke();
             const metrics = signaling.canvasCtx.measureText("A");
-            console.log("metrics", metrics)
             const fontHeight = (metrics.fontBoundingBoxAscent || metrics.actualBoundingBoxAscent * 1.5) + (metrics.fontBoundingBoxDescent || metrics.actualBoundingBoxDescent * 1.5);
 
             for (let i = 0; i < textLines.length; i++) {
