@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/adalkiran/go-colorful-logging v0.0.0-20220727222645-510ed2f38d6c
-	github.com/adalkiran/go-inventa v0.0.0-20220727222215-12e3bdbfd497
+	github.com/adalkiran/go-inventa v0.0.0-20220801134015-1e2e827dc2ae
 )
 
 require (
@@ -38,5 +38,5 @@ require (
 	github.com/xlab/libvpx-go v0.0.0-20220203233824-652b2616315c
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 	golang.org/x/net v0.0.0-20220728211354-c7608f3a8462 // indirect
-	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
+	golang.org/x/sys v0.0.0-20220731174439-a90be440212d // indirect
 )
