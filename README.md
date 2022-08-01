@@ -48,7 +48,7 @@ You can run it in production mode or development mode.
 * Clone this repo and run in terminal:
 
 ```sh
-$ docker-compose up -d
+$ docker-compose --profile single_host up -d
 ```
 
 * Wait until Go and Python modules were installed and configured. This can take some time. You can check out the download status by:
