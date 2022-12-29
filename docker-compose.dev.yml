@@ -6,7 +6,7 @@ services:
 #  mediabridge:
 #    entrypoint: /entrypoint-dev.sh
 
-  inference:
+  c-inference:
 #    entrypoint: /entrypoint-dev.sh
     deploy:
       replicas: 1

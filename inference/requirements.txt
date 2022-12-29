@@ -9,8 +9,10 @@ matplotlib
 
 seaborn
 
+onnxoptimizer==0.2.7
+
 onnxruntime
 
-yolox
+yolox==0.3.0
 
 inventa

@@ -29,6 +29,8 @@ from yolox.utils import mkdir, multiclass_nms, demo_postprocess, vis
 
 from inventa import Inventa, ServiceDescriptor
 
+from redis import asyncio as aioredis
+
 from .base_inference_task import BaseInferenceTask
 
 STREAM_IMAGES = "images"
@@ -154,7 +156,8 @@ class YoloxInferenceTask(BaseInferenceTask):
                     key, messages = resp[0]
                     asyncio.ensure_future(self.process_images_messages(messages, self.inventa, session))
 
-            except ConnectionError as e:
+            except aioredis.ConnectionError as e:
                 print(f"ERROR REDIS CONNECTION: {e}")
+                await asyncio.sleep(.1)
             await asyncio.sleep(.01)
 
