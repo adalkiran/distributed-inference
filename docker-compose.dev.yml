@@ -10,3 +10,13 @@ services:
 #    entrypoint: /entrypoint-dev.sh
     deploy:
       replicas: 1
+
+  d-inference:
+#    entrypoint: /entrypoint-dev.sh
+    deploy:
+      replicas: 1
+
+  dgpu-inference:
+#    entrypoint: /entrypoint-dev.sh
+    deploy:
+      replicas: 1

@@ -9,7 +9,8 @@
             "type": "python",
             "request": "launch",
             "program": "src/app.py",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
 
     ]

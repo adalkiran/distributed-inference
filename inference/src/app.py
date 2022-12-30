@@ -46,7 +46,7 @@ async def try_register_to_orchestrator(inventa: Inventa):
 
 def exception_handler(loop, context):
     try:
-        if context["future"].get_name() == "try_register_to_orchestrator":
+        if context["future"]._coro and context["future"]._coro.__name__ == "try_register_to_orchestrator":
             loop.stop()
         else:
             raise context["exception"]
@@ -62,7 +62,7 @@ def main():
     event_loop = asyncio.get_event_loop()
     event_loop.set_exception_handler(exception_handler)
     inventa = connect_to_redis()
-    event_loop.create_task(try_register_to_orchestrator(inventa), name="try_register_to_orchestrator")
+    event_loop.create_task(try_register_to_orchestrator(inventa))
     
     for inference_task_cls in ExportedInferenceTasks:
         inference_task = inference_task_cls(inventa, SelfDescriptor)

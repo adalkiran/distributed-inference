@@ -4,7 +4,8 @@ services:
     profiles:
     - single_host
     - central
-    - central_with_inference
+    - central_with_inference_cpu
+    - central_with_inference_gpu
     extends:
       file: docker-compose.common.yml
       service: x-web
@@ -19,7 +20,8 @@ services:
   d-redis:
     profiles:
     - central
-    - central_with_inference
+    - central_with_inference_cpu
+    - central_with_inference_gpu
     extends:
       file: docker-compose.common.yml
       service: x-redis
@@ -30,7 +32,8 @@ services:
     profiles:
     - single_host
     - central
-    - central_with_inference
+    - central_with_inference_cpu
+    - central_with_inference_gpu
     extends:
       file: docker-compose.common.yml
       service: x-ui
@@ -39,7 +42,8 @@ services:
     profiles:
     - single_host
     - central
-    - central_with_inference
+    - central_with_inference_cpu
+    - central_with_inference_gpu
     extends:
       file: docker-compose.common.yml
       service: x-signaling
@@ -48,7 +52,8 @@ services:
     profiles:
     - single_host
     - central
-    - central_with_inference
+    - central_with_inference_cpu
+    - central_with_inference_gpu
     extends:
       file: docker-compose.common.yml
       service: x-mediabridge
@@ -59,18 +64,36 @@ services:
   c-inference:
     profiles:
     - single_host
-    - central_with_inference
+    - central_with_inference_cpu
     extends:
       file: docker-compose.common.yml
       service: x-inference
     deploy:
       replicas: 5
 
+  cgpu-inference:
+    profiles:
+    - central_with_inference_gpu
+    extends:
+      file: docker-compose.common.yml
+      service: x-gpu-inference
+    deploy:
+      replicas: 1
+
   d-inference:
     profiles:
-    - inference
+    - inference_cpu
     extends:
       file: docker-compose.common.yml
       service: x-inference
     deploy:
       replicas: 10
+
+  dgpu-inference:
+    profiles:
+    - inference_gpu
+    extends:
+      file: docker-compose.common.yml
+      service: x-gpu-inference
+    deploy:
+      replicas: 1

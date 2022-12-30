@@ -13,7 +13,6 @@
 #   limitations under the License.
 #   ==============================================================================
 
-from ast import Str
 import asyncio
 
 import io
@@ -125,7 +124,8 @@ class YoloxInferenceTask(BaseInferenceTask):
             await asyncio.sleep(0)
 
     async def run(self):
-        session = onnxruntime.InferenceSession("/home/yolox_nano.onnx")
+        print(f"{self.get_task_name()} will run on {onnxruntime.get_device()}")
+        session = onnxruntime.InferenceSession("/home/yolox_nano.onnx", providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
         # See: https://redis-py-doc.readthedocs.io/en/master/
         # See: https://developpaper.com/detailed-explanation-of-redis-stream-type-commands/
         try:

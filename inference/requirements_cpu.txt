@@ -11,8 +11,8 @@ seaborn
 
 onnxoptimizer==0.2.7
 
-onnxruntime
+onnxruntime==1.8.0
 
 yolox==0.3.0
 
-inventa
+inventa==0.0a15

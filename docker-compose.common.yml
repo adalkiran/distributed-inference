@@ -110,3 +110,20 @@ services:
     - REDIS_HOST
     - REDIS_PORT
     - REDIS_PASSWORD
+
+  x-gpu-inference:
+    extends:
+      service: x-inference
+    image: distributed-inference/inference-gpu
+    build:
+      context: inference # Dockerfile location
+      dockerfile: Dockerfile.cuda
+      args:
+      - CUDA_VERSION=${CUDA_VERSION:-11.4.2}
+      - CUDNN_VERSION=${CUDNN_VERSION:-8}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
