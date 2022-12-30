@@ -1,8 +1,6 @@
 # See: https://github.com/ovh/ai-training-examples/blob/main/jobs/flask/object-detection-yolov5-app/requirements.txt
 pandas
 
-torch
-
 opencv-python-headless
 
 matplotlib
