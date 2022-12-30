@@ -2,7 +2,8 @@ version: '3'
 services:
   c-web:
     profiles:
-    - single_host
+    - single_host_cpu
+    - single_host_gpu
     - central
     - central_with_inference_cpu
     - central_with_inference_gpu
@@ -12,7 +13,8 @@ services:
 
   c-redis:
     profiles:
-    - single_host
+    - single_host_cpu
+    - single_host_gpu
     extends:
       file: docker-compose.common.yml
       service: x-redis
@@ -30,7 +32,8 @@ services:
 
   c-ui:
     profiles:
-    - single_host
+    - single_host_cpu
+    - single_host_gpu
     - central
     - central_with_inference_cpu
     - central_with_inference_gpu
@@ -40,7 +43,8 @@ services:
 
   c-signaling:
     profiles:
-    - single_host
+    - single_host_cpu
+    - single_host_gpu
     - central
     - central_with_inference_cpu
     - central_with_inference_gpu
@@ -50,7 +54,8 @@ services:
 
   c-mediabridge:
     profiles:
-    - single_host
+    - single_host_cpu
+    - single_host_gpu
     - central
     - central_with_inference_cpu
     - central_with_inference_gpu
@@ -63,7 +68,7 @@ services:
 
   c-inference:
     profiles:
-    - single_host
+    - single_host_cpu
     - central_with_inference_cpu
     extends:
       file: docker-compose.common.yml
@@ -73,6 +78,7 @@ services:
 
   cgpu-inference:
     profiles:
+    - single_host_gpu
     - central_with_inference_gpu
     extends:
       file: docker-compose.common.yml
