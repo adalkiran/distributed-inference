@@ -12,6 +12,8 @@ This project consists of WebRTC signaling and orchestrator service(Go), WebRTC m
 Uses
 * [Inventa for Go](https://github.com/adalkiran/go-inventa) and [Inventa for Python](https://github.com/adalkiran/py-inventa) to do service orchestration and to make RPC over Redis. For more information, you can check out [Inventa Examples](https://github.com/adalkiran/inventa-examples) repo.
 * [Pion WebRTC](https://github.com/pion/webrtc) library to implement WebRTC related stuff.
+* [ONNX](https://onnx.ai) and [ONNX Runtime](https://onnxruntime.ai) to run models both on CPU and GPU.
+* [PyTorch](https://pytorch.org) as [ONNX Runtime](https://onnxruntime.ai) backend.
 * [YOLOX model](https://github.com/Megvii-BaseDetection/YOLOX) for object detection from captured images.
 
 <br>
@@ -37,6 +39,8 @@ Docker Compose file creates some containers, with some replica instances:
 
 * **inference:** The service will register itself to the orchestrator, and can keep track of "images" Redis Stream which streams JPEG image data of video frames. Written in Python language. It makes inferences on incoming images with YOLOX model for object detection.
     <br>
+    Accourding to configuration or chosen Docker Compose Profile, it can run on CPU or CUDA modes, also can run as distributed service in different machines.
+    <br>
     Can be more than one, by docker-compose.yml file's replica values, default is 5.
 
 * **ui:** The web frontend. It gets a media stream from webcam and forwards it to assigned mediabridge service via WebRTC.
@@ -45,11 +49,96 @@ You can run it in production mode or development mode.
 
 ### **Production Mode**
 
+There are different Docker Compose Profiles for different configurations you can choose:
+
+#### **1. Single Host, only CPU**
+
+This profile is to run whole services in same host machine, which has no graphic card supporting CUDA. Redis instance will be stay internal, won't be exposed to network.
+
 * Clone this repo and run in terminal:
 
 ```sh
-$ docker-compose --profile single_host up -d
+$ docker-compose --profile single_host_cpu up -d
 ```
+
+#### **2. Single Host, with GPU support**
+
+This profile is to run whole services in same host machine, which has at least one graphic card supporting CUDA. Redis instance will be stay internal, won't be exposed to network.
+
+* Clone this repo and run in terminal:
+
+```sh
+$ docker-compose --profile single_host_gpu up -d
+```
+
+#### **3. Central services with inference service, only CPU**
+
+This profile is to run whole services in same host machine, which has no graphic card supporting CUDA. Redis instance will be exposed to network, so other inference services on different hosts can be registered further.
+
+Similar to ```single_host_cpu```, it can provide all services individually, but supports extra hosts.
+
+* Clone this repo and run in terminal:
+
+```sh
+$ docker-compose --profile central_with_inference_cpu up -d
+```
+
+#### **4. Central services with inference service, with GPU support**
+
+This profile is to run whole services in same host machine, which has at least one graphic card supporting CUDA. Redis instance will be exposed to network, so other inference services on different hosts can be registered further.
+
+Similar to ```single_host_cpu```, it can provide all services individually, but supports extra hosts.
+
+* Clone this repo and run in terminal:
+
+```sh
+$ docker-compose --profile central_with_inference_gpu up -d
+```
+
+#### **5. Central services without inference service, multiple hosts mode**
+
+##### **5.1. Steps should be done in central host:**
+
+This profile is to run only central services in host machine, without inference services. It doesn't function without any extra inference services with properly registered into Signaling service. Redis instance will be exposed to network, so other inference services on different hosts can be registered further.
+
+* Clone this repo and run in terminal:
+
+```sh
+$ docker-compose --profile central up -d
+```
+
+##### **5.2. Steps should be done in other multiple inference hosts:**
+
+* Clone this repo.
+* Edit ```.env``` file, specify the central host's Redis server connection information with ```REDIS_HOST``` and ```REDIS_PORT``` environment variables, as your central host's IP:
+
+```
+...
+REDIS_HOST=ip_of_central_host # should be "redis" if single host configuration, e.g. 192.168.0.15 in distributed configuration
+REDIS_PORT=port_of_central_host_redis_port # default is 6379
+...
+```
+
+**For only CPU mode:**
+
+* Run in terminal:
+
+```sh
+$ docker-compose --profile inference_cpu up -d
+```
+
+**For with GPU support mode:**
+
+* Run in terminal:
+
+```sh
+$ docker-compose --profile inference_gpu up -d
+```
+
+
+
+
+#### **Common post-instructions for all alternative configurations:**
 
 * Wait until Go and Python modules were installed and configured. This can take some time. You can check out the download status by:
 
@@ -66,10 +155,12 @@ To continue with VS Code and if this is your first time to work with Remote Cont
 Then, follow these steps:
 
 * Clone this repo to your local filesystem
+* Due to VS Code hasn't support Docker Compose Profiles yet, we can't let VS Code trigger docker-compose via devcontainer.json file, you should call docker-compose manually as described above, at **Production Mode** chapter.
 * Open the folder "distributed-inference" with VS Code by "Open Folder..." command. This opens the root folder of the project.
+* Ensure correct service name written at ```service``` key at ```.devcontainer/devcontainer.json``` of particular service folder you want to debug.
 * Press <kbd>F1</kbd> and select **"Remote Containers: Open Folder in Container..."** then select one of folders in the root folder, not the root folder itself. You can select any of the services, which you want to develop.
-* This command creates (if they don't exist) required containers in Docker, then connects inside of distributed-inference-[your-selected-service] container for development and debugging purposes.
-* Wait until the containers are created, configured, and related VS Code server extensions installed inside the container. This can take some time. VS Code can ask for some required installations, click "Install All" for these prompts.
+* This command connects inside of distributed-inference-[your-selected-service] container for development and debugging purposes.
+* Wait until the container configured, and related VS Code server extensions installed inside the container. This can take some time. VS Code can ask for some required installations, click "Install All" for these prompts.
 * After completion of all installations, press <kbd>F5</kbd> to start server application.
     <br>
     **Note:** Maybe you must kill existing running service processes by terminal.
