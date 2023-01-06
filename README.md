@@ -20,6 +20,24 @@ Uses
 
 ![Pipeline Diagram](docs/images/01-pipeline.drawio.svg)
 
+**Web application:**
+
+When you click on "Create PeerConnection" button, if everything configured correctly:
+* It wants you to give permission the browser to access your webcam,
+* Your webcam will be turned on and webcam video will be played on the black area,
+* Webcam video will be streamed to the ```Media Bridge``` service via WebRTC,
+* ```Media Bridge``` service will capture frame images from the video as JPEG images, pushes them to Redis Streams,
+* One of available ```Inference``` services will pop a JPEG image data from Redis Streams stream (```STREAM_IMAGES = "images"```), execute YOLOX inference model, push detected objects' name, box coordinates, prediction score and resolution to other Redis Streams stream (```STREAM_PREDICTIONS = "predictions"```),
+* The ```Signaling``` service listens and consumes the Redis Streams stream (```predictions```), sends the results to relevant participant (by ```participantId``` in the JSON) via WebSockets.
+* Web client will draw boxes for each predictions, and writes results to the browser console.
+
+![Web App](docs/images/02-webapp.png)
+
+<br>
+
+**Client side logs:**
+
+![Client Side Logs](docs/images/03-client-side-logs.png)
 ## **WHY THIS PROJECT?**
 
 This project aims to demonstrate an approach to designing cross-language and distributed pipeline in deep learning/machine learning domain. Tons of demos and examples can be found on the internet which are developed end to end only (mostly) in Python. But this project is one of cross-language examples.
