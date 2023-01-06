@@ -16,6 +16,8 @@ Uses
 
 <br>
 
+![Pipeline Diagram](docs/images/01-pipeline.drawio.svg)
+
 ## **WHY THIS PROJECT?**
 
 This project aims to demonstrate an approach to designing cross-language and distributed pipeline in deep learning/machine learning domain. Tons of demos and examples can be found on the internet which are developed end to end only (mostly) in Python. But this project is one of cross-language examples.
