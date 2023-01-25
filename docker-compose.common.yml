@@ -7,7 +7,7 @@ services:
     ports:
     - "${WEB_HTTP_PORT}:80"
     environment:
-    - NGINX_HOST=localhost
+    - NGINX_HOST=${WEB_DOMAIN}
     - NGINX_PORT=80
     networks:
       default:
@@ -23,7 +23,7 @@ services:
         - VARIANT:7.0.1-bullseye
     volumes:
       - "./redis/templates:/templates:cached"
-      - "./redis/data:/data"
+      - "./data/redis/data:/data"
     environment:
     - REDIS_PORT
     - REDIS_PASSWORD
@@ -127,3 +127,77 @@ services:
           devices:
             - driver: nvidia
               capabilities: [gpu]
+
+  x-grafana:
+    image: grafana/grafana
+    user: "472"
+    volumes:
+    - ./data/grafana/data:/var/lib/grafana
+    - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+    - GF_SECURITY_ADMIN_PASSWORD
+    - "GF_SERVER_ROOT_URL=http://${WEB_DOMAIN}:${WEB_HTTP_PORT}/grafana"
+    - GF_SERVER_SERVE_FROM_SUB_PATH=true
+    networks:
+      default:
+        aliases:
+        - grafana
+
+  x-influxdb:
+    image: influxdb:2.6.1
+    volumes:
+    - ./data/influxdbv2:/var/lib/influxdb2:rw
+    environment:
+    - DOCKER_INFLUXDB_INIT_MODE=setup
+    - DOCKER_INFLUXDB_INIT_USERNAME
+    - DOCKER_INFLUXDB_INIT_PASSWORD
+    - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+    - DOCKER_INFLUXDB_INIT_ORG
+    - DOCKER_INFLUXDB_INIT_BUCKET
+    networks:
+      default:
+        aliases:
+        - influxdb
+
+  x-telegraf:
+    image: telegraf:1.25
+    user: telegraf:root
+    volumes:
+    - ./monitoring/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    # See: https://github.com/docker/for-mac/issues/4755
+    - /var/run/docker.sock.raw:/var/run/docker.sock
+    environment:
+    - INFLUXDB_HOST
+    - INFLUXDB_PORT
+    - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+    - DOCKER_INFLUXDB_INIT_ORG
+    - DOCKER_INFLUXDB_INIT_BUCKET
+    - HOSTNAME_TAG
+    networks:
+      default:
+        aliases:
+        - telegraf
+
+  # See: Agent mode: https://prometheus.io/blog/2021/11/16/agent/
+  x-prometheus:
+    image: prom/prometheus:latest
+    user: nobody:root
+    volumes:
+    - ./monitoring/prometheus/config:/etc/prometheus
+    - ./data/prometheus/data:/prometheus
+    # See: https://github.com/docker/for-mac/issues/4755
+    - /var/run/docker.sock.raw:/var/run/docker.sock
+    environment:
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.agent.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+      - '--enable-feature=agent'
+    networks:
+      default:
+        aliases:
+        - prometheus
+
+

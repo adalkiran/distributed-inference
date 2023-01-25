@@ -130,13 +130,19 @@ $ docker-compose --profile central up -d
 ##### **5.2. Steps should be done in other multiple inference hosts:**
 
 * Clone this repo.
-* Edit ```.env``` file, specify the central host's Redis server connection information with ```REDIS_HOST``` and ```REDIS_PORT``` environment variables, as your central host's IP:
+* Edit ```.env``` file, specify the central host's Redis server and InfluxDB server connection information with ```REDIS_HOST```, ```REDIS_PORT``` ```INFLUXDB_HOST```, ```INFLUXDB_PORT``` environment variables, as your central host's IP. Also specify ```HOSTNAME_TAG``` different value to differentiate host metrics in Grafana:
 
 ```
+...
+HOSTNAME_TAG=tag_name_for_host_machine
 ...
 REDIS_HOST=ip_of_central_host # should be "redis" if single host configuration, e.g. 192.168.0.15 in distributed configuration
 REDIS_PORT=port_of_central_host_redis_port # default is 6379
 ...
+INFLUXDB_HOST=ip_of_central_host # should be "influxdb" if single host configuration, e.g. 192.168.0.15 in distributed configuration
+INFLUXDB_PORT=port_of_central_host_influxdb_port  # default is 8086
+...
+
 ```
 
 **For only CPU mode:**

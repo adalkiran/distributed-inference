@@ -16,6 +16,9 @@
 import asyncio
 from os import environ
 import traceback
+import string
+
+from prometheus_client import start_http_server, Summary, Counter
 
 from tasks import ExportedInferenceTasks
 
@@ -26,6 +29,13 @@ from inventa import Inventa, InventaRole, ServiceDescriptor
 hostname = environ.get("HOSTNAME")
 SelfDescriptor = ServiceDescriptor.ParseServiceFullId(f"svc:inf:{hostname}")
 SignalingDescriptor = ServiceDescriptor.ParseServiceFullId("svc:sgn:")
+
+def create_metrics_for_task(task_id: string):
+    return {
+        "inference_time": Summary(f"inference_time", f"Duration of frame processing", ["task"]).labels(task=task_id),
+        "inference_frame_count": Counter(f"inference_frame_count", f"Total number of processed frames", ["task"]).labels(task=task_id)
+    }
+
 
 def connect_to_redis() -> Inventa:
     hostname = environ.get("REDIS_HOST", "localhost")
@@ -59,6 +69,8 @@ def main():
     print("=================================")
     print("This module acts as Deep Learning Inference Worker.\n\n\n")
 
+    start_http_server(8000)
+    
     event_loop = asyncio.get_event_loop()
     event_loop.set_exception_handler(exception_handler)
     inventa = connect_to_redis()
@@ -66,6 +78,8 @@ def main():
     
     for inference_task_cls in ExportedInferenceTasks:
         inference_task = inference_task_cls(inventa, SelfDescriptor)
+        inference_task_metrics = create_metrics_for_task(inference_task.get_task_id())
+        inference_task.set_metrics(inference_task_metrics)
         print("Starting inference task: ", inference_task.get_task_id(), " - ", inference_task.get_task_name())
         event_loop.create_task(inference_task.run())
 

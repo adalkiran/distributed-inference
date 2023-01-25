@@ -5,3 +5,5 @@ yolox==0.3.0
 onnxruntime-gpu
 
 inventa==0.0a15
+
+prometheus-client

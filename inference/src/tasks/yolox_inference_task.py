@@ -106,22 +106,24 @@ class YoloxInferenceTask(BaseInferenceTask):
 
     async def process_images_messages(self, messages, inventa: Inventa, session):
         for message in messages:
-            message_id, data = message
-            participant_id = data[b"participantId"]
-            timestamp = data[b"timestamp"]
-            img_bytes = data[b"img"]
-            # print("REDIS ID: ", message_id, ", participantId: ", participant_id, ", timestamp: ", timestamp)
-            predictions = self.get_prediction(img_bytes, session)
-            meta_data = {
-                "participantId": participant_id,
-                "timestamp": timestamp,
-            }
-            stream_data = {**meta_data, **predictions}
-            # print("Predictions: ", stream_data)
-            #See: https://redis.io/commands/xadd/
-            await inventa.Client.xadd(STREAM_PREDICTIONS, stream_data, maxlen=100)
-            await inventa.Client.xack(STREAM_IMAGES, CONSUMER_GROUP_IMAGES, message_id)
-            await asyncio.sleep(0)
+            with self.metrics_inference_time.time():
+                message_id, data = message
+                participant_id = data[b"participantId"]
+                timestamp = data[b"timestamp"]
+                img_bytes = data[b"img"]
+                # print("REDIS ID: ", message_id, ", participantId: ", participant_id, ", timestamp: ", timestamp)
+                predictions = self.get_prediction(img_bytes, session)
+                meta_data = {
+                    "participantId": participant_id,
+                    "timestamp": timestamp,
+                }
+                stream_data = {**meta_data, **predictions}
+                # print("Predictions: ", stream_data)
+                #See: https://redis.io/commands/xadd/
+                await inventa.Client.xadd(STREAM_PREDICTIONS, stream_data, maxlen=100)
+                await inventa.Client.xack(STREAM_IMAGES, CONSUMER_GROUP_IMAGES, message_id)
+                self.metrics_inference_frame_count.inc()
+                await asyncio.sleep(0)
 
     async def run(self):
         print(f"{self.get_task_name()} will run on {onnxruntime.get_device()}")

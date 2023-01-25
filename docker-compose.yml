@@ -103,3 +103,57 @@ services:
       service: x-gpu-inference
     deploy:
       replicas: 1
+
+  c-grafana:
+    profiles:
+    - single_host_cpu
+    - single_host_gpu
+    - central
+    - central_with_inference_cpu
+    - central_with_inference_gpu
+    extends:
+      file: docker-compose.common.yml
+      service: x-grafana
+
+  c-influxdb:
+    profiles:
+    - single_host_cpu
+    - single_host_gpu
+    extends:
+      file: docker-compose.common.yml
+      service: x-influxdb
+
+  d-influxdb:
+    profiles:
+    - central
+    - central_with_inference_cpu
+    - central_with_inference_gpu
+    extends:
+      file: docker-compose.common.yml
+      service: x-influxdb
+    ports:
+    - "${INFLUXDB_PORT}:8086"
+
+  c-telegraf:
+    profiles:
+    - single_host_cpu
+    - single_host_gpu
+    - central
+    - central_with_inference_cpu
+    - central_with_inference_gpu
+    extends:
+      file: docker-compose.common.yml
+      service: x-telegraf
+
+  c-prometheus:
+    profiles:
+    - single_host_cpu
+    - single_host_gpu
+    - central
+    - central_with_inference_cpu
+    - central_with_inference_gpu
+    extends:
+      file: docker-compose.common.yml
+      service: x-prometheus
+    ports:
+    - 9090:9090

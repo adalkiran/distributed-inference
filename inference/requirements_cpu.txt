@@ -14,3 +14,5 @@ onnxruntime==1.8.0
 yolox==0.3.0
 
 inventa==0.0a15
+
+prometheus-client

@@ -19,9 +19,17 @@ import string
 from inventa import Inventa, ServiceDescriptor
 
 class BaseInferenceTask(ABC):
+    metrics: dict
+
     def __init__(self, inventa: Inventa, SelfDescriptor: ServiceDescriptor):
         self.inventa = inventa
         self.SelfDescriptor = SelfDescriptor
+
+    def set_metrics(self, metrics: dict):
+        self.metrics = metrics
+        self.metrics_inference_time = metrics["inference_time"]
+        self.metrics_inference_frame_count = metrics["inference_frame_count"]
+
 
     @abstractmethod
     def get_task_id(self) -> string:

@@ -1,0 +1,31 @@
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+
+# See: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_write
+
+remote_write:
+  - url: "http://telegraf:1234/recieve"
+    basic_auth:
+      username: admin
+      password: PTB2epFmCUeZj3bU
+
+scrape_configs:
+  - job_name: "inference"
+    scrape_interval: 2s
+    metrics_path: /metrics
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        port: 8000
+    relabel_configs:
+      # Only keep containers that have a `prometheus-job` label.
+      - source_labels: [__meta_docker_container_name]
+        regex: .+-(c|d)-inference-(.+)
+        action: keep
+      # Use the task labels that are prefixed by `prometheus-`.
+      # See: https://www.robustperception.io/controlling-the-instance-label/
+      # See: https://blog.freshtracks.io/prometheus-relabel-rules-and-the-action-parameter-39c71959354a
+      - source_labels: [__meta_docker_container_name]
+        regex: .+-(c|d)-inference-(.+)
+        target_label: instance
+        replacement: inference_$2
