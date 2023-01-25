@@ -69,6 +69,25 @@ You can run it in production mode or development mode.
 
 ### **Production Mode**
 
+#### **Note: Docker Host Operating System**
+
+After completion of choosen one of options below, this step should be done:
+
+* Edit ```.env``` file.
+* If Docker Host operating system is Linux, ```DOCKER_SOCKET_SUFFIX``` should be left blank as:
+
+```
+...
+DOCKER_SOCKET_SUFFIX=
+```
+
+* If Docker Host operating system is MacOS, ```DOCKER_SOCKET_SUFFIX``` should be ".raw" as:
+
+```
+...
+DOCKER_SOCKET_SUFFIX=.raw
+```
+
 There are different Docker Compose Profiles for different configurations you can choose:
 
 #### **1. Single Host, only CPU**

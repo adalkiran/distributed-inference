@@ -161,7 +161,7 @@ services:
 
   x-telegraf:
     image: telegraf:1.25
-    user: telegraf:root
+    privileged: true
     volumes:
     - ./monitoring/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     # See: https://github.com/docker/for-mac/issues/4755
@@ -181,7 +181,7 @@ services:
   # See: Agent mode: https://prometheus.io/blog/2021/11/16/agent/
   x-prometheus:
     image: prom/prometheus:latest
-    user: nobody:root
+    user: root:root
     volumes:
     - ./monitoring/prometheus/config:/etc/prometheus
     - ./data/prometheus/data:/prometheus

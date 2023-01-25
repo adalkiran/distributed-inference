@@ -20,12 +20,12 @@ scrape_configs:
     relabel_configs:
       # Only keep containers that have a `prometheus-job` label.
       - source_labels: [__meta_docker_container_name]
-        regex: .+-(c|d)-inference-(.+)
+        regex: .+-(c|d)(gpu)?-inference-(.+)
         action: keep
       # Use the task labels that are prefixed by `prometheus-`.
       # See: https://www.robustperception.io/controlling-the-instance-label/
       # See: https://blog.freshtracks.io/prometheus-relabel-rules-and-the-action-parameter-39c71959354a
       - source_labels: [__meta_docker_container_name]
-        regex: .+-(c|d)-inference-(.+)
+        regex: .+-(c|d)(gpu)?-inference-(.+)
         target_label: instance
-        replacement: inference_$2
+        replacement: inference_$3
