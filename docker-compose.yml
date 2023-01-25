@@ -141,6 +141,8 @@ services:
     - central
     - central_with_inference_cpu
     - central_with_inference_gpu
+    - inference_cpu
+    - inference_gpu
     extends:
       file: docker-compose.common.yml
       service: x-telegraf
@@ -152,6 +154,8 @@ services:
     - central
     - central_with_inference_cpu
     - central_with_inference_gpu
+    - inference_cpu
+    - inference_gpu
     extends:
       file: docker-compose.common.yml
       service: x-prometheus
