@@ -165,7 +165,7 @@ services:
     volumes:
     - ./monitoring/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     # See: https://github.com/docker/for-mac/issues/4755
-    - /var/run/docker.sock.raw:/var/run/docker.sock
+    - /var/run/docker.sock${DOCKER_SOCKET_SUFFIX}:/var/run/docker.sock
     environment:
     - INFLUXDB_HOST
     - INFLUXDB_PORT
@@ -186,7 +186,7 @@ services:
     - ./monitoring/prometheus/config:/etc/prometheus
     - ./data/prometheus/data:/prometheus
     # See: https://github.com/docker/for-mac/issues/4755
-    - /var/run/docker.sock.raw:/var/run/docker.sock
+    - /var/run/docker.sock${DOCKER_SOCKET_SUFFIX}:/var/run/docker.sock
     environment:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
