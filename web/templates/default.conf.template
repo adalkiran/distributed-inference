@@ -48,4 +48,16 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
     }
+
+    location /prometheus {
+        set $prometheus_server_name prometheus;
+        set $prometheus_server_port 9090;
+
+        proxy_pass http://$prometheus_server_name:$prometheus_server_port$1;
+        proxy_set_header Host $http_host;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
 }

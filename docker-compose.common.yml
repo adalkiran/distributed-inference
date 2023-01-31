@@ -204,6 +204,9 @@ services:
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--web.enable-lifecycle'
       - '--enable-feature=agent'
+      # See: https://blog.cubieserver.de/2020/configure-prometheus-on-a-sub-path-behind-reverse-proxy/
+      - '--web.external-url=/prometheus/'
+      - '--web.route-prefix=/prometheus/'
     networks:
       default:
         aliases:
