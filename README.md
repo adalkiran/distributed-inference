@@ -118,9 +118,8 @@ DOCKER_SOCKET_SUFFIX=""
 ...
 ```
 
-* If Docker Host operating system is **Windows**, ```DOCKER_SOCKET_PREFIX``` should be "/" as:
-<br>
-(See: https://stackoverflow.com/a/41005007)
+* If Docker Host operating system is **Windows**, ```DOCKER_SOCKET_PREFIX``` should be "/" as (See: https://stackoverflow.com/a/41005007):
+
 ```
 ...
 DOCKER_SOCKET_PREFIX="/"
@@ -128,9 +127,7 @@ DOCKER_SOCKET_SUFFIX=""
 ...
 ```
 
-* If Docker Host operating system is **MacOS**, ```DOCKER_SOCKET_SUFFIX``` should be ".raw" as:
-<br>
-(See: https://github.com/docker/for-mac/issues/4755)
+* If Docker Host operating system is **MacOS**, ```DOCKER_SOCKET_SUFFIX``` should be ".raw" as (See: https://github.com/docker/for-mac/issues/4755):
 
 ```
 ...
