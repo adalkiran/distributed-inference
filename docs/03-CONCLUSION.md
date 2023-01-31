@@ -22,6 +22,6 @@ Adil Alper DALKIRAN
 
 <div align="right">
 
-[&lt;&nbsp;&nbsp;Previous chapter: MONITORING](./03-MONITORING.md)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Home&nbsp;&nbsp;&gt;&gt;](../README.md)
+[&lt;&nbsp;&nbsp;Previous chapter: MONITORING](./02-MONITORING.md)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Home&nbsp;&nbsp;&gt;&gt;](../README.md)
 
 </div>
