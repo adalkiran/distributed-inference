@@ -1,7 +1,7 @@
 version: '3'
 services:
   x-web:
-    image: nginx
+    image: nginx:1.23.3
     volumes:
     - ./web/templates:/etc/nginx/templates
     ports:
@@ -129,7 +129,7 @@ services:
               capabilities: [gpu]
 
   x-grafana:
-    image: grafana/grafana
+    image: grafana/grafana:1.25
     user: "472"
     volumes:
     - ./data/grafana/data:/var/lib/grafana
@@ -189,7 +189,7 @@ services:
 
   # See: Agent mode: https://prometheus.io/blog/2021/11/16/agent/
   x-prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v2.41.0
     user: root:root
     volumes:
     - ./monitoring/prometheus/config:/etc/prometheus
