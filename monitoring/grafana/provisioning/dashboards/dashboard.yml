@@ -1,0 +1,13 @@
+# See: https://grafana.com/tutorials/provision-dashboards-and-data-sources/#configuration-as-code
+# See: https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards
+# See: https://github.com/grafana/grafana/blob/main/devenv/dashboards.yaml
+
+apiVersion: 1
+
+providers:
+  - name: 'Default'
+    folder: 'General'
+    type: file
+    options:
+      path: '$GF_PATHS_PROVISIONING/dashboards'
+      foldersFromFilesStructure: true

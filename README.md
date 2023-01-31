@@ -9,44 +9,71 @@ Cross-language and distributed deep learning inference pipeline for WebRTC video
 
 This project consists of WebRTC signaling and orchestrator service(Go), WebRTC media server service (Go), YOLOX model deep learning inference service (Python), and Web front-end (TypeScript).
 
-Uses
+Uses for functionality:
 * [Inventa for Go](https://github.com/adalkiran/go-inventa) and [Inventa for Python](https://github.com/adalkiran/py-inventa) to do service orchestration and to make RPC over Redis. For more information, you can check out [Inventa Examples](https://github.com/adalkiran/inventa-examples) repo.
 * [Pion WebRTC](https://github.com/pion/webrtc) library to implement WebRTC related stuff.
 * [ONNX](https://onnx.ai) and [ONNX Runtime](https://onnxruntime.ai) to run models both on CPU and GPU.
 * [PyTorch](https://pytorch.org) as [ONNX Runtime](https://onnxruntime.ai) backend.
 * [YOLOX model](https://github.com/Megvii-BaseDetection/YOLOX) for object detection from captured images.
 
+Uses for monitoring:
+* [Grafana](https://grafana.com/) ([github](https://github.com/grafana/grafana)) to monitor metrics visually.
+* [InfluxDB](https://www.influxdata.com/) ([github](https://github.com/influxdata/influxdb)) to store collected metrics.
+* [Prometheus](https://prometheus.io/) ([github](https://github.com/prometheus/prometheus)) for service discovery and collecting metrics of microservices on each host. Prometheus is used in "agent mode" in this project's configuration, it pushes data to Telegraf instance with "remote write" method.
+* [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/) ([github](https://github.com/influxdata/telegraf)) for container discovery and collect statistics of Docker Containers and microservice metrics from Prometheus on each host, it pushes to central InfluxDB instance.
+
 <br>
 
 ![Pipeline Diagram](docs/images/01-pipeline.drawio.svg)
 
-**Web application:**
+<br>
 
-When you click on "Create PeerConnection" button, if everything configured correctly:
-* It wants you to give permission the browser to access your webcam,
-* Your webcam will be turned on and webcam video will be played on the black area,
+## **WHY THIS PROJECT?**
+
+This project aims to demonstrate an approach to designing cross-language and distributed pipeline in deep learning/machine learning domain. Tons of demos and examples can be found on the internet which are developed end-to-end only (mostly) in Python. But this project is one of cross-language examples.
+
+In this project, a Kubernetes-like orchestrator was not used, in place of this,  independent Docker engines on different bare-metal host machines were configured, on purpose. The aim is to show how to configure things on multi-bare-metal host machines or multi-datacenter environments, only using Docker.
+
+<br>
+
+## **DOCUMENTATION**
+
+More details of the project and monitoring configuration can be found in [docs folder](docs/).
+
+<br>
+
+## **WEB APPLICATION**
+
+![Web App](docs/images/02-webapp.png)
+
+When you click on "Create PeerConnection" button, if everything is configured correctly:
+* It wants you to give permission to the browser to access your webcam,
+* Your webcam will be turned on and webcam video will be played in the black area,
 * Webcam video will be streamed to the ```Media Bridge``` service via WebRTC,
 * ```Media Bridge``` service will capture frame images from the video as JPEG images, pushes them to Redis Streams,
 * One of available ```Inference``` services will pop a JPEG image data from Redis Streams stream (```STREAM_IMAGES = "images"```), execute YOLOX inference model, push detected objects' name, box coordinates, prediction score and resolution to other Redis Streams stream (```STREAM_PREDICTIONS = "predictions"```),
 * The ```Signaling``` service listens and consumes the Redis Streams stream (```predictions```), sends the results to relevant participant (by ```participantId``` in the JSON) via WebSockets.
-* Web client will draw boxes for each predictions, and writes results to the browser console.
-
-![Web App](docs/images/02-webapp.png)
+* Web client will draw boxes for each prediction, and writes results to the browser console.
 
 <br>
 
 **Client side logs:**
 
 ![Client Side Logs](docs/images/03-client-side-logs.png)
-## **WHY THIS PROJECT?**
 
-This project aims to demonstrate an approach to designing cross-language and distributed pipeline in deep learning/machine learning domain. Tons of demos and examples can be found on the internet which are developed end to end only (mostly) in Python. But this project is one of cross-language examples.
+<br>
+
+## **MONITORING**
+
+**Monitoring topology:**
+
+![Monitoring Topology](docs/images/04-monitoring-topology.drawio.svg)
 
 <br>
 
 ## **INSTALLATION and RUNNING**
 
-This project was designed to run in Docker Container. For some configurations, you can check out docker-compose.yaml and .env file in the root folder.
+This project was designed to run in Docker Container. For some configurations, you can check out docker-compose.yaml and .env files in the root folder.
 
 Docker Compose file creates some containers, with some replica instances:
 * **redis:** Runs a Redis instance.
@@ -55,11 +82,11 @@ Docker Compose file creates some containers, with some replica instances:
 
 * **mediabridge service:** The service will register itself to the orchestrator, and can respond to "sdp-offer-req" and "sdp-accept-offer-answer" procedure calls. Also uses [Pion WebRTC](https://github.com/pion/webrtc) library to serve as a WebRTC server on a UDP port. Written in Go language.
     <br>
-    Designed to run as more than one instances, but currently can run only one instance because it should expose a UDP port from Docker container, and different container replicas on same host should be assigned different and available port numbers and the application must know the exposed host port number, in this stage, it couldn't be achieved to dynamically manage this. Maybe it can be achieved on Kubernetes.
+    Designed to run as more than one instance, but currently can run only one instance because it should expose a UDP port from Docker container, and different container replicas on same host should be assigned different and available port numbers and the application must know the exposed host port number, in this stage, it couldn't be achieved to dynamically manage this. Maybe it can be achieved on Kubernetes.
 
 * **inference:** The service will register itself to the orchestrator, and can keep track of "images" Redis Stream which streams JPEG image data of video frames. Written in Python language. It makes inferences on incoming images with YOLOX model for object detection.
     <br>
-    Accourding to configuration or chosen Docker Compose Profile, it can run on CPU or CUDA modes, also can run as distributed service in different machines.
+    According to configuration or chosen Docker Compose Profile, it can run on CPU or CUDA modes, and also can run as distributed service in different machines.
     <br>
     Can be more than one, by docker-compose.yml file's replica values, default is 5.
 
@@ -71,7 +98,7 @@ You can run it in production mode or development mode.
 
 #### **Note: Docker Host Operating System**
 
-After completion of choosen one of options below, this step should be done:
+After completion of chosen one of options below, this step should be done:
 
 * Edit ```.env``` file.
 * Specify ```HOSTNAME_TAG``` different value to differentiate host metrics in Grafana:
@@ -102,7 +129,7 @@ There are different Docker Compose Profiles for different configurations you can
 
 #### **1. Single Host, only CPU**
 
-This profile is to run whole services in same host machine, which has no graphic card supporting CUDA. Redis instance will be stay internal, won't be exposed to network.
+This profile is to run whole services in same host machine, which has no graphic card supporting CUDA. Redis instance will be staying internal, and won't be exposed to network.
 
 * Clone this repo and run in terminal:
 
@@ -112,7 +139,7 @@ $ docker-compose --profile single_host_cpu up -d
 
 #### **2. Single Host, with GPU support**
 
-This profile is to run whole services in same host machine, which has at least one graphic card supporting CUDA. Redis instance will be stay internal, won't be exposed to network.
+This profile is to run whole services in same host machine, which has at least one graphic card supporting CUDA. Redis instance will be staying internal, and won't be exposed to network.
 
 * Clone this repo and run in terminal:
 
@@ -208,7 +235,7 @@ To continue with VS Code and if this is your first time to work with Remote Cont
 Then, follow these steps:
 
 * Clone this repo to your local filesystem
-* Due to VS Code hasn't support Docker Compose Profiles yet, we can't let VS Code trigger docker-compose via devcontainer.json file, you should call docker-compose manually as described above, at **Production Mode** chapter.
+* Due to VS Code hasn't support Docker Compose Profiles yet, we can't let VS Code trigger docker-compose via devcontainer.json file, you should call docker-compose manually as described above, in **Production Mode** chapter.
 * Open the folder "distributed-inference" with VS Code by "Open Folder..." command. This opens the root folder of the project.
 * Ensure correct service name written at ```service``` key at ```.devcontainer/devcontainer.json``` of particular service folder you want to debug.
 * Press <kbd>F1</kbd> and select **"Remote Containers: Open Folder in Container..."** then select one of folders in the root folder, not the root folder itself. You can select any of the services, which you want to develop.

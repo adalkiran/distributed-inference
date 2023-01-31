@@ -1,0 +1,48 @@
+# See: https://community.grafana.com/t/setting-up-datasources-for-grafana-provisioning/75799
+# See: https://grafana.com/tutorials/provision-dashboards-and-data-sources/#configuration-as-code
+# See: https://grafana.com/docs/grafana/latest/administration/provisioning/#datasources
+# See: https://github.com/grafana/grafana/blob/main/devenv/datasources.yaml
+
+# config file version
+apiVersion: 1
+
+# list of datasources to insert/update depending
+# whats available in the database
+datasources:
+  # <string, required> name of the datasource. Required
+- name: Distributed Inference InfluxDB
+  # <string, required> datasource type. Required
+  type: influxdb
+  # <string, required> access mode. direct or proxy. Required
+  access: proxy
+  # <int> org id. will default to orgId 1 if not specified
+  orgId: 1
+  # <string> Sets a custom UID to reference this
+  # data source in other parts of the configuration.
+  # If not specified, Grafana generates one.
+  uid: distributed-inference-influxdb-influxql
+  # <string> url
+  url: http://$INFLUXDB_HOST:$INFLUXDB_PORT
+  # <string> database user, if used
+  user: $DOCKER_INFLUXDB_INIT_USERNAME
+  # <string> database name, if used
+  database: $DOCKER_INFLUXDB_INIT_BUCKET
+  # <bool> enable/disable basic auth
+  basicAuth: false
+#  withCredentials:
+  # <bool> mark as default datasource. Max one per org
+  isDefault: true
+  # <map> fields that will be converted to json and stored in json_data
+  jsonData:
+    timeInterval: "5s"
+    httpMode: POST
+    httpHeaderName1: 'Authorization'
+#  # <string> json object of data that will be encrypted.
+  secureJsonData:
+    # <string> database password, if used
+    password: $DOCKER_INFLUXDB_INIT_PASSWORD
+    httpHeaderValue1: 'Token $DOCKER_INFLUXDB_INIT_ADMIN_TOKEN'
+
+  version: 1
+  # <bool> allow users to edit datasources from the UI.
+  editable: true
