@@ -109,19 +109,33 @@ HOSTNAME_TAG=tag_name_for_host_machine
 ...
 ```
 
-* If Docker Host operating system is Linux, ```DOCKER_SOCKET_SUFFIX``` should be left blank as:
+* If Docker Host operating system is **Linux**, ```DOCKER_SOCKET_PREFIX``` and ```DOCKER_SOCKET_SUFFIX``` should be left blank as:
 
 ```
 ...
-DOCKER_SOCKET_SUFFIX=
+DOCKER_SOCKET_PREFIX=""
+DOCKER_SOCKET_SUFFIX=""
 ...
 ```
 
-* If Docker Host operating system is MacOS, ```DOCKER_SOCKET_SUFFIX``` should be ".raw" as:
+* If Docker Host operating system is **Windows**, ```DOCKER_SOCKET_PREFIX``` should be "/" as:
+<br>
+(See: [https://stackoverflow.com/a/41005007](https://stackoverflow.com/a/41005007))
+```
+...
+DOCKER_SOCKET_PREFIX="/"
+DOCKER_SOCKET_SUFFIX=""
+...
+```
+
+* If Docker Host operating system is **MacOS**, ```DOCKER_SOCKET_SUFFIX``` should be ".raw" as:
+<br>
+(See: [https://github.com/docker/for-mac/issues/4755](https://github.com/docker/for-mac/issues/4755))
 
 ```
 ...
-DOCKER_SOCKET_SUFFIX=.raw
+DOCKER_SOCKET_PREFIX=""
+DOCKER_SOCKET_SUFFIX=".raw"
 ...
 ```
 

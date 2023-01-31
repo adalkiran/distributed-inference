@@ -172,8 +172,9 @@ services:
     privileged: true
     volumes:
     - ./monitoring/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-    # See: https://github.com/docker/for-mac/issues/4755
-    - /var/run/docker.sock${DOCKER_SOCKET_SUFFIX}:/var/run/docker.sock
+    # See: (Windows) https://stackoverflow.com/a/41005007
+    # See: (MacOS) https://github.com/docker/for-mac/issues/4755
+    - ${DOCKER_SOCKET_PREFIX}/var/run/docker.sock${DOCKER_SOCKET_SUFFIX}:/var/run/docker.sock
     environment:
     - INFLUXDB_HOST
     - INFLUXDB_PORT
@@ -193,8 +194,9 @@ services:
     volumes:
     - ./monitoring/prometheus/config:/etc/prometheus
     - ./data/prometheus/data:/prometheus
-    # See: https://github.com/docker/for-mac/issues/4755
-    - /var/run/docker.sock${DOCKER_SOCKET_SUFFIX}:/var/run/docker.sock
+    # See: (Windows) https://stackoverflow.com/a/41005007
+    # See: (MacOS) https://github.com/docker/for-mac/issues/4755
+    - ${DOCKER_SOCKET_PREFIX}/var/run/docker.sock${DOCKER_SOCKET_SUFFIX}:/var/run/docker.sock
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.agent.path=/prometheus'

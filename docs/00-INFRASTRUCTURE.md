@@ -45,7 +45,8 @@ Used as "central host".
 
 ```
 HOSTNAME_TAG=mbp
-DOCKER_SOCKET_SUFFIX=.raw # should be ".raw" if host operating system is MacOS. If Linux, should be left blank.
+DOCKER_SOCKET_PREFIX="" # should be "/" if host operating system is Windows. If Linux or MacOS, should be left blank "".
+DOCKER_SOCKET_SUFFIX=".raw" # should be ".raw" if host operating system is MacOS. If Linux or Windows, should be left blank "".
 
 WEB_DOMAIN=localhost
 WEB_HTTP_PORT=9000
@@ -88,7 +89,8 @@ My desktop machine has Nvidia GPUs. Ubuntu 22.04.1 LTS is running. CUDA 11.4.2 a
 
 ```
 HOSTNAME_TAG=desktop
-DOCKER_SOCKET_SUFFIX= # should be ".raw" if host operating system is MacOS. If Linux, should be left blank.
+DOCKER_SOCKET_PREFIX="" # should be "/" if host operating system is Windows. If Linux or MacOS, should be left blank "".
+DOCKER_SOCKET_SUFFIX="" # should be ".raw" if host operating system is MacOS. If Linux or Windows, should be left blank "".
 
 WEB_DOMAIN=localhost
 WEB_HTTP_PORT=9000
