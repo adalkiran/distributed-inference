@@ -73,7 +73,7 @@ To see monitoring metrics via Grafana, you can visit http://localhost:9000/grafa
 
 ![Monitoring Topology](docs/images/04-monitoring-topology.drawio.svg)
 
-For more details, read the [Monitoring documentation](./docs/01-APPLICATION.md).
+For more details, read the [Monitoring documentation](./docs/02-MONITORING.md).
 
 <br>
 
