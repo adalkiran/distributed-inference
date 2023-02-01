@@ -102,9 +102,11 @@ You can run it in production mode or development mode.
 
 ### **Production Mode**
 
+* Clone this repo to your local filesystem
+
 #### **Note: Docker Host Operating System**
 
-After completion of chosen one of options below, this step should be done:
+Before doing chosen one of options below, this step should be done:
 
 * Edit ```.env``` file.
 * Specify ```HOSTNAME_TAG``` different value to differentiate host metrics in Grafana:
@@ -148,7 +150,7 @@ There are different Docker Compose Profiles for different configurations you can
 
 This profile is to run whole services in same host machine, which has no graphic card supporting CUDA. Redis instance will be staying internal, and won't be exposed to network.
 
-* Clone this repo and run in terminal:
+* Run in terminal:
 
 ```sh
 $ docker-compose --profile single_host_cpu up -d
@@ -158,7 +160,7 @@ $ docker-compose --profile single_host_cpu up -d
 
 This profile is to run whole services in same host machine, which has at least one graphic card supporting CUDA. Redis instance will be staying internal, and won't be exposed to network.
 
-* Clone this repo and run in terminal:
+* Run in terminal:
 
 ```sh
 $ docker-compose --profile single_host_gpu up -d
@@ -170,7 +172,7 @@ This profile is to run whole services in same host machine, which has no graphic
 
 Similar to ```single_host_cpu```, it can provide all services individually, but supports extra hosts.
 
-* Clone this repo and run in terminal:
+* Run in terminal:
 
 ```sh
 $ docker-compose --profile central_with_inference_cpu up -d
@@ -182,7 +184,7 @@ This profile is to run whole services in same host machine, which has at least o
 
 Similar to ```single_host_cpu```, it can provide all services individually, but supports extra hosts.
 
-* Clone this repo and run in terminal:
+* Run in terminal:
 
 ```sh
 $ docker-compose --profile central_with_inference_gpu up -d
@@ -194,7 +196,7 @@ $ docker-compose --profile central_with_inference_gpu up -d
 
 This profile is to run only central services in host machine, without inference services. It doesn't function without any extra inference services with properly registered into Signaling service. Redis instance will be exposed to network, so other inference services on different hosts can be registered further.
 
-* Clone this repo and run in terminal:
+* Run in terminal:
 
 ```sh
 $ docker-compose --profile central up -d
