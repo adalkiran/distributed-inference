@@ -44,6 +44,8 @@ More details of the project and monitoring configuration can be found in [docs f
 
 ## **WEB APPLICATION**
 
+To access the web application UI, you can visit http://localhost:9000 (Tested on Chrome), after configuring the containers.
+
 ![Web App](docs/images/02-webapp.png)
 
 When you click on "Create PeerConnection" button, if everything is configured correctly:
@@ -64,6 +66,8 @@ When you click on "Create PeerConnection" button, if everything is configured co
 <br>
 
 ## **MONITORING**
+
+To see monitoring metrics via Grafana, you can visit http://localhost:9000/grafana.
 
 **Monitoring topology:**
 
@@ -240,6 +244,7 @@ $ docker-compose logs -f
 ```
 
 * After waiting for enough time, open a web browser and visit http://localhost:9000 (Tested on Chrome)
+* Also, to see monitoring metrics via Grafana, you can visit http://localhost:9000/grafana
 
 ### <a name="dev-mode"></a>**Development Mode: VS Code Remote - Containers**
 
