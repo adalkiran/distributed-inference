@@ -69,6 +69,8 @@ When you click on "Create PeerConnection" button, if everything is configured co
 
 ![Monitoring Topology](docs/images/04-monitoring-topology.drawio.svg)
 
+For more details, read the [Monitoring documentation](./docs/01-APPLICATION.md).
+
 <br>
 
 ## **INSTALLATION and RUNNING**

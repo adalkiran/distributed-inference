@@ -4,6 +4,14 @@ This project offers different types of topologies which are described in main [R
 
 In this documentation, we used a configuration consisting of a MacBook Pro M1 Chip and a desktop machine with Nvidia GPUs.
 
+<br>
+
+**Application topology:**
+
+![Pipeline Diagram](./images/01-pipeline.drawio.svg)
+
+<br>
+
 ## **0.1. EXAMPLE CONFIGURATION (Single-host)**
 
 If you want to try this project on only one host machine, you can choose the proper profile option:
@@ -33,13 +41,15 @@ Execute command:
 $ docker-compose --profile single_host_gpu up -d
 ```
 
-
+<br>
 
 ## **0.2. EXAMPLE CONFIGURATION (My configuration, Multi-host)**
 
 ### **a. MacBook Pro:**
 
-Used as "central host".
+Used as "central host", with inference workers.
+
+My MacBook Pro machine is Apple Silicon M1 (ARM64/AARCH64) version. Inference workers will run in CPU mode.
 
 * ```.env``` file was edited as:
 
@@ -78,6 +88,8 @@ GF_SECURITY_ADMIN_PASSWORD=admin
 ```sh
 $ docker-compose --profile central_with_inference_cpu up -d
 ```
+
+<br>
 
 ### **b. Desktop:**
 
