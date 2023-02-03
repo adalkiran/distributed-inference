@@ -7,7 +7,26 @@
 
 Cross-language and distributed deep learning inference pipeline for WebRTC video streams over Redis Streams. Currently supports YOLOX model, which can run well on CPU.
 
-This project consists of WebRTC signaling and orchestrator service(Go), WebRTC media server service (Go), YOLOX model deep learning inference service (Python), and Web front-end (TypeScript).
+<br>
+
+![YOLOX Original Image](docs/images/00-yolox-original-image.png)
+<sup>*Original image from [YOLOX model](https://github.com/Megvii-BaseDetection/YOLOX) to show what this application does in the end.*<sup>
+
+![Pipeline Diagram](docs/images/01-pipeline.drawio.svg)
+<sup>*Topology diagram of this project.*<sup>
+<br>
+
+## **WHY THIS PROJECT?**
+
+This project aims to demonstrate an approach to designing cross-language and distributed pipeline in deep learning/machine learning domain. Tons of demos and examples can be found on the internet which are developed end-to-end only (mostly) in Python. But this project is one of cross-language examples.
+
+In this project, a Kubernetes-like orchestrator was not used, in place of this,  independent Docker engines on different bare-metal host machines were configured, on purpose. The aim is to show how to configure things on multi-bare-metal host machines or multi-datacenter environments, only using Docker.
+
+<br>
+
+## **INGREDIENTS**
+
+This project consists of WebRTC signaling and orchestrator service(Go), WebRTC media server service (Go), YOLOX model deep learning inference service (Python), and Web front-end (TypeScript). Also includes a monitoring stack.
 
 Uses for functionality:
 * [Inventa for Go](https://github.com/adalkiran/go-inventa) and [Inventa for Python](https://github.com/adalkiran/py-inventa) to do service orchestration and to make RPC over Redis. For more information, you can check out [Inventa Examples](https://github.com/adalkiran/inventa-examples) repo.
@@ -21,18 +40,6 @@ Uses for monitoring:
 * [InfluxDB](https://www.influxdata.com/) ([github](https://github.com/influxdata/influxdb)) to store collected metrics.
 * [Prometheus](https://prometheus.io/) ([github](https://github.com/prometheus/prometheus)) for service discovery and collecting metrics of microservices on each host. Prometheus is used in "agent mode" in this project's configuration, it pushes data to Telegraf instance with "remote write" method.
 * [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/) ([github](https://github.com/influxdata/telegraf)) for container discovery and collect statistics of Docker Containers and microservice metrics from Prometheus on each host, it pushes to central InfluxDB instance.
-
-<br>
-
-![Pipeline Diagram](docs/images/01-pipeline.drawio.svg)
-
-<br>
-
-## **WHY THIS PROJECT?**
-
-This project aims to demonstrate an approach to designing cross-language and distributed pipeline in deep learning/machine learning domain. Tons of demos and examples can be found on the internet which are developed end-to-end only (mostly) in Python. But this project is one of cross-language examples.
-
-In this project, a Kubernetes-like orchestrator was not used, in place of this,  independent Docker engines on different bare-metal host machines were configured, on purpose. The aim is to show how to configure things on multi-bare-metal host machines or multi-datacenter environments, only using Docker.
 
 <br>
 
@@ -74,6 +81,20 @@ To see monitoring metrics via Grafana, you can visit http://localhost:9000/grafa
 ![Monitoring Topology](docs/images/04-monitoring-topology.drawio.svg)
 
 For more details, read the [Monitoring documentation](./docs/02-MONITORING.md).
+
+**Accessing Grafana:**
+
+To see monitoring metrics via Grafana, you can visit http://localhost:9000/grafana after configuring the containers.
+
+* Login screen: You should log in to Grafana with user: ```admin```, password: ```admin```, if you didn't change ```GF_SECURITY_ADMIN_PASSWORD``` environment variable. After that, it will ask you to change the password, you can click on Skip button.
+
+* Grafana Dashboard while the system was processing 1 client which was sending webcam video approximately 30 frames per second (fps). We see, the ```desktop``` host machine with GPUs was processed more frame images than the ```mbp``` host machine.
+
+![Grafana dashboard](docs/images/05-grafana-dashboard.png)
+
+* Current monitoring configuration can't gather GPU metrics for now, the ```nvidia-smi``` tool output of my desktop machine (with GPUs) was like this while running inference (you can see 5 Python processes have been interacting with GPU, and we have 5 replicas running in on this host machine):
+
+![nvidia-smi output](docs/images/06-nvidia-smi.png)
 
 <br>
 
