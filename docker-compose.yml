@@ -84,7 +84,7 @@ services:
       file: docker-compose.common.yml
       service: x-gpu-inference
     deploy:
-      replicas: 1
+      replicas: 5
 
   d-inference:
     profiles:
@@ -93,7 +93,7 @@ services:
       file: docker-compose.common.yml
       service: x-inference
     deploy:
-      replicas: 10
+      replicas: 5
 
   dgpu-inference:
     profiles:
@@ -102,7 +102,7 @@ services:
       file: docker-compose.common.yml
       service: x-gpu-inference
     deploy:
-      replicas: 1
+      replicas: 5
 
   c-grafana:
     profiles:
