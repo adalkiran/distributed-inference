@@ -947,7 +947,7 @@
           ]
         },
         {
-          "alias": "$tag_container_name TX traffic",
+          "alias": "$tag_host | $tag_container_name TX traffic",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB}"
@@ -962,6 +962,12 @@
             {
               "params": [
                 "container_name"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "host"
               ],
               "type": "tag"
             },
