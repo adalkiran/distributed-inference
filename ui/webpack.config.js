@@ -9,12 +9,21 @@ module.exports = {
     },
     devtool: "inline-source-map",
     devServer: {
-        disableHostCheck: true,
+        allowedHosts: "all",
         host: "0.0.0.0",
         port: "80",
-        public: 'http://0.0.0.0:' + env.WEB_HTTP_PORT,
-        publicPath: "/",
-        contentBase: "./dist",
+        client: {
+            webSocketURL: {
+                hostname: "0.0.0.0",
+                port: env.WEB_HTTP_PORT
+            }
+        },
+        devMiddleware: {
+            publicPath: "/"
+        },        
+        static: {
+            directory: "./dist"
+        },
         hot: true
     },
     output: {
