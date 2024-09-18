@@ -1,7 +1,6 @@
-version: '3'
 services:
   x-web:
-    image: nginx:1.23.3
+    image: nginx:1.27.1
     volumes:
     - ./web/templates:/etc/nginx/templates
     ports:
@@ -20,7 +19,7 @@ services:
       context: redis # Dockerfile location
       args:
         # See for available variants: https://hub.docker.com/_/redis?tab=tags
-        - VARIANT:7.0.1-bullseye
+        - VARIANT:7.2.5-bookworm
     volumes:
       - "./redis/templates:/templates:cached"
       - "./data/redis/data:/data"
@@ -37,8 +36,8 @@ services:
     build:
       context: ui # Dockerfile location
       args:
-        # See for available variants: https://github.com/microsoft/vscode-dev-containers/tree/main/containers/typescript-node
-        - VARIANT:18-bullseye
+        # See for available variants: https://github.com/devcontainers/images/tree/main/src/typescript-node
+        - VARIANT:22-bookworm
     environment:
       - WEB_HTTP_PORT
     volumes:
@@ -55,7 +54,7 @@ services:
       context: signaling # Dockerfile location
       args:
         # See for available variants: https://hub.docker.com/_/golang?tab=tags
-        - VARIANT:1.20.2-bullseye
+        - VARIANT:1.23.0-bookworm
     # See: https://code.visualstudio.com/docs/remote/create-dev-container#_set-up-a-folder-to-run-in-a-container
     # [Optional] Required for ptrace-based debuggers like C++, Go, and Rust
     cap_add:
@@ -80,7 +79,7 @@ services:
       context: mediabridge # Dockerfile location
       args:
         # See for available variants: https://hub.docker.com/_/golang?tab=tags
-        - VARIANT:1.20.2-bullseye
+        - VARIANT:1.23.0-bookworm
     # See: https://code.visualstudio.com/docs/remote/create-dev-container#_set-up-a-folder-to-run-in-a-container
     # [Optional] Required for ptrace-based debuggers like C++, Go, and Rust
     cap_add:
@@ -119,8 +118,8 @@ services:
       context: inference # Dockerfile location
       dockerfile: Dockerfile.cuda
       args:
-      - CUDA_VERSION=${CUDA_VERSION:-11.4.2}
-      - CUDNN_VERSION=${CUDNN_VERSION:-8}
+      - CUDA_VERSION=${CUDA_VERSION:-12.5.1}
+      - CUDNN_VERSION=${CUDNN_VERSION:-}
     deploy:
       resources:
         reservations:
@@ -129,7 +128,7 @@ services:
               capabilities: [gpu]
 
   x-grafana:
-    image: grafana/grafana:9.3.6
+    image: grafana/grafana:11.2.0
     user: "472"
     volumes:
     - ./data/grafana/data:/var/lib/grafana
@@ -152,7 +151,7 @@ services:
         - grafana
 
   x-influxdb:
-    image: influxdb:2.6.1
+    image: influxdb:2.7.10
     volumes:
     - ./data/influxdbv2:/var/lib/influxdb2:rw
     environment:
@@ -168,13 +167,15 @@ services:
         - influxdb
 
   x-telegraf:
-    image: telegraf:1.25
+    image: telegraf:1.31.3
     privileged: true
+    user: root
+    entrypoint: "telegraf"
     volumes:
     - ./monitoring/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     # See: (Windows) https://stackoverflow.com/a/41005007
     # See: (MacOS) https://github.com/docker/for-mac/issues/4755
-    - ${DOCKER_SOCKET_PREFIX}/var/run/docker.sock${DOCKER_SOCKET_SUFFIX}:/var/run/docker.sock
+    - ${DOCKER_SOCKET_PREFIX}/var/run/docker.sock${DOCKER_SOCKET_SUFFIX}:/var/run/docker.sock:ro
     environment:
     - INFLUXDB_HOST
     - INFLUXDB_PORT
@@ -189,7 +190,7 @@ services:
 
   # See: Agent mode: https://prometheus.io/blog/2021/11/16/agent/
   x-prometheus:
-    image: prom/prometheus:v2.41.0
+    image: prom/prometheus:v2.54.1
     user: root:root
     volumes:
     - ./monitoring/prometheus/config:/etc/prometheus

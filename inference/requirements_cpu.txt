@@ -7,11 +7,13 @@ matplotlib
 
 seaborn
 
-onnxoptimizer==0.2.7
+onnxoptimizer==0.3.13
 
-onnxruntime==1.8.0
+onnxruntime
 
-yolox==0.3.0
+#yolox==0.3.0
+git+https://github.com/adalkiran/YOLOX.git@main
+
 
 inventa==0.0a15
 

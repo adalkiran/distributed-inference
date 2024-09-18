@@ -1,4 +1,4 @@
-ARG VARIANT=3.9.13-slim-bullseye
+ARG VARIANT=3.12.5-slim-bookworm
 FROM python:${VARIANT}
 
 COPY entrypoint.sh entrypoint-dev.sh requirements_cpu.txt /
@@ -6,7 +6,7 @@ COPY entrypoint.sh entrypoint-dev.sh requirements_cpu.txt /
 WORKDIR /workspace
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install curl cmake build-essential protobuf-compiler libprotoc-dev ffmpeg libsm6 libxext6 libjpeg-dev libpng-dev \
+    && apt-get -y install git curl cmake build-essential protobuf-compiler libprotoc-dev ffmpeg libsm6 libxext6 libjpeg-dev libpng-dev \
     && chown -R 42420:42420 /workspace \
     && python -m pip install --upgrade pip \
     && pip install --upgrade wheel setuptools \

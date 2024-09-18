@@ -1,6 +1,9 @@
 # See: https://github.com/ovh/ai-training-examples/blob/main/jobs/flask/object-detection-yolov5-app/requirements.txt
 
-yolox==0.3.0
+#yolox==0.3.0
+git+https://github.com/adalkiran/YOLOX.git@main
+
+onnxoptimizer==0.3.13
 
 onnxruntime-gpu
 

@@ -1,5 +1,5 @@
 # See for available variants: https://hub.docker.com/_/redis?tab=tags
-ARG VARIANT=7.0.1-bullseye
+ARG VARIANT=7.2.5-bookworm
 FROM redis:${VARIANT}
 
 COPY entrypoint.sh /
