@@ -18,3 +18,7 @@ body {
 .stack-top{
     z-index: 9;
 }
+
+.lbl {
+    color: white;
+}

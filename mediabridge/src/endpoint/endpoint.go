@@ -191,10 +191,19 @@ func (e *Endpoint) AcceptSDPOfferAnswer(sdpOfferAnswer string) error {
 	})
 }
 
+func (e *Endpoint) safeEncodeJpeg(buffer *bytes.Buffer, img *vpx.Image) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("error: %v, image width: %d, height: %d", r, img.W, img.H)
+		}
+	}()
+	return jpeg.Encode(buffer, img.ImageYCbCr(), nil)
+}
+
 func (e *Endpoint) processVP9Track(track *webrtc.TrackRemote, endpointManager *EndpointManager) {
 	//See: https://gist.github.com/mholbergerNIMBL/e5d17491a8cad621d53c6ed1b505ab7a#file-main-go-L6
 	//See: https://stackoverflow.com/questions/68859120/how-to-convert-vp8-interframe-into-image-with-pion-webrtc
-	sampleBuilder := samplebuilder.New(20000, &codecs.VP9Packet{}, track.Codec().ClockRate)
+	sampleBuilder := samplebuilder.New(60000, &codecs.VP9Packet{}, track.Codec().ClockRate)
 	decoder := vpx.DecoderIfaceVP9()
 	ctx := vpx.NewCodecCtx()
 
@@ -235,7 +244,7 @@ func (e *Endpoint) processVP9Track(track *webrtc.TrackRemote, endpointManager *E
 
 		err = vpx.Error(vpx.CodecDecode(ctx, string(samplePop.Data), dataSize, nil, 0))
 		if err != nil {
-			log.Println("[WARN]", err)
+			log.Println("[WARN]", err, fmt.Sprintf(", dataSize: %d", dataSize))
 			continue
 		}
 
@@ -246,7 +255,7 @@ func (e *Endpoint) processVP9Track(track *webrtc.TrackRemote, endpointManager *E
 			fileCount++
 
 			buffer := new(bytes.Buffer)
-			if err = jpeg.Encode(buffer, img.ImageYCbCr(), nil); err != nil {
+			if err = e.safeEncodeJpeg(buffer, img); err != nil {
 				fmt.Printf("jpeg Encode Error: %s\r\n", err)
 				continue
 			}

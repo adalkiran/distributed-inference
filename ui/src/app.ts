@@ -43,7 +43,7 @@ class RTC {
 
     constructor(videoElm: any) {
         this.videoElm = videoElm;
-        this.localConnection = this.createLocalPeerConnection();
+        this.localConnection = null;
     }
 
     createLocalPeerConnection() {
@@ -51,22 +51,20 @@ class RTC {
             iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
         });
         result.onicecandidate = (e: RTCPeerConnectionIceEvent) => {
-            if ((<any>e.target).iceGatheringState != "complete") {
-                return;
+            if (e.candidate === null) {
+                console.log('onicecandidate: localSessionDescription:\n', (<any>e.target).localDescription);
+            } else {            
+                console.log('New ICE candidate:', e.candidate);
             }
-            console.log("onicecandidate", e.candidate, "\n", e);
-            const parsedSdp: sdpTransform.SessionDescription = sdpTransform.parse(
-                this.localConnection.localDescription.sdp
-            );
-            this.localDescriptionChanged(parsedSdp);
         };
         result.addEventListener("track", (e) => {
             console.log("onTrack", e);
         });
         result.onicecandidateerror = (e: Event) => {
-            console.log("onicecandidateerror", e);
+            console.log("onicecandidateerror", "candidate address:", (<any>e).hostCandidate ?? '', "error text:", (<any>e).errorText ?? '', e);
         };
         result.onconnectionstatechange = (e: Event) => {
+            this.updateStatus((<any>e.target).connectionState);
             console.log(
                 "onconnectionstatechange",
                 (<any>e.target).connectionState,
@@ -75,14 +73,28 @@ class RTC {
             );
         };
         result.oniceconnectionstatechange = (e: Event) => {
+            const peerConnection = <any>e.target;
+            this.updateStatus(peerConnection.iceConnectionState);
             console.log(
                 "oniceconnectionstatechange",
-                (<any>e.target).iceConnectionState,
+                peerConnection.iceConnectionState,
                 "\n",
                 e
             );
-            if ((<any>e.target).iceConnectionState == "disconnected") {
+            if (peerConnection.iceConnectionState == "disconnected") {
                 this.stop(true);
+            } else if (peerConnection.iceConnectionState === 'connected' || peerConnection.iceConnectionState === 'completed') {
+                // Get the stats for the peer connection
+                peerConnection.getStats().then((stats: any) => {                
+                    stats.forEach((report: any) => {
+                        if (report.type === 'candidate-pair' && report.state === 'succeeded') {
+                            const localCandidate = stats.get(report.localCandidateId);
+                            const remoteCandidate = stats.get(report.remoteCandidateId);
+                            console.log('Succeded Local Candidate:', report.localCandidateId, 'address:', localCandidate?.address, 'object:', localCandidate);
+                            console.log('Succeded Remote Candidate:', report.remoteCandidateId, 'address:', remoteCandidate?.address, 'object:', remoteCandidate);
+                        }
+                    });
+                });
             }
         };
         result.onicegatheringstatechange = (e: Event) => {
@@ -107,23 +119,6 @@ class RTC {
         return result;
     }
 
-    createOffer(): Promise<sdpTransform.SessionDescription> {
-        return this.localConnection.createOffer().then((sdp) => {
-            this.localConnection.setLocalDescription(sdp);
-            const parsedSdp: sdpTransform.SessionDescription = sdpTransform.parse(
-                sdp.sdp
-            );
-            console.log(
-                "setLocalDescription",
-                "type:",
-                sdp.type,
-                "sdp:\n",
-                parsedSdp
-            );
-            return parsedSdp;
-        });
-    }
-
     createLocalTracks(): Promise<MediaStream> {
         if (!navigator.mediaDevices) {
             throw new Error("You are trying to access a remote web app using HTTP. Browsers does not allow using WebRTC while connecting not secure HTTP. Please try connecting the web app with HTTPS instead.");
@@ -131,13 +126,15 @@ class RTC {
         return navigator.mediaDevices.getUserMedia({
             video: {
                 height: 720,
-                frameRate: { max: 30 } 
+                frameRate: { max: 30 },
             },
-            audio: true,
+            audio: false,
         });
     }
 
     start() {
+        this.updateStatus("starting...");
+        this.localConnection = this.createLocalPeerConnection();
         return this.createLocalTracks()
             .then((stream) => {
                 stream.getTracks().forEach((track) => {
@@ -171,17 +168,16 @@ class RTC {
             localTrack.enabled = false;
             localTrack.stop();
         });
-        if (closeConnection) {
+        if (closeConnection && this.localConnection) {
+            const updateStatusRequired = !(this.localConnection.iceConnectionState == "disconnected");
             this.localConnection.close();
-            //Recreate a new RTCPeerConnection which is in "stable" signaling state.
-            this.localConnection = this.createLocalPeerConnection();
+            this.localConnection = null;
+            if (updateStatusRequired) {
+                this.updateStatus("closed");
+            }
         }
         this.localTracks = [];
         console.log("Stopping tracks. closeConnection: ", closeConnection);
-    }
-
-    localDescriptionChanged(parsedSdp: sdpTransform.SessionDescription) {
-        this.sendSdpToSignaling(parsedSdp);
     }
 
     sendSdpToSignaling(parsedSdp: sdpTransform.SessionDescription) {
@@ -202,6 +198,10 @@ class RTC {
                     .createAnswer()
                     .then((answer: RTCSessionDescriptionInit) => {
                         console.log("answer", answer.type, answer.sdp);
+                        const parsedSdp: sdpTransform.SessionDescription = sdpTransform.parse(
+                            answer.sdp
+                        );
+                        this.sendSdpToSignaling(parsedSdp);
                         this.localConnection.setLocalDescription(answer);
                     });
             })
@@ -210,6 +210,10 @@ class RTC {
                 alert("Error while acceptOffer:\n" + e);
                 this.stop(true);
             });
+    }
+
+    updateStatus(connStatus: string) {
+        $("#LblConnStatus").text("Connection status: " + connStatus);
     }
 }
 
@@ -241,7 +245,12 @@ class Signaling {
         };
 
         this.ws.onmessage = (message) => {
-            const data = message.data ? JSON.parse(message.data) : null;
+            let data = null;
+            try {
+                data = message.data ? JSON.parse(message.data) : null;
+            } catch {
+                // Do nothing
+            }
             console.log("Received from WS:", message.data);
             if (!data) {
                 return;
@@ -292,6 +301,7 @@ class Signaling {
         signaling.canvasCtx = ctx;
         canvasElm.width = ($(videoElm).width());
         canvasElm.height = ($(videoElm).height());
+        console.log("Video was resized: ",canvasElm.width, "x", canvasElm.height);
         signaling.canvasCtx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     }
 
