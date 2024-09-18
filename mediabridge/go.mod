@@ -5,7 +5,6 @@ go 1.23
 require (
 	github.com/adalkiran/go-colorful-logging v0.0.0-20230320153608-5450ace21b18
 	github.com/adalkiran/go-inventa v0.0.0-20220820202421-3911d0fc7a27
-	github.com/pion/ice/v4 v4.0.1
 	github.com/pion/webrtc/v4 v4.0.0-beta.29
 )
 
@@ -14,6 +13,7 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fatih/color v1.17.0 // indirect
 	github.com/pion/dtls/v3 v3.0.1 // indirect
+	github.com/pion/ice/v4 v4.0.1 // indirect
 	github.com/pion/mdns/v2 v2.0.7 // indirect
 	github.com/pion/srtp/v3 v3.0.3 // indirect
 	github.com/pion/stun/v3 v3.0.0 // indirect

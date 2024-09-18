@@ -24,7 +24,7 @@ import (
 
 	"github.com/adalkiran/go-inventa"
 	"github.com/pion/interceptor"
-	"github.com/pion/webrtc/v3"
+	"github.com/pion/webrtc/v4"
 )
 
 type EndpointManager struct {
@@ -98,9 +98,9 @@ func (m *EndpointManager) createMediaEngine() (*webrtc.MediaEngine, error) {
 	me := &webrtc.MediaEngine{}
 
 	// Setup the codecs you want to use.
-	// We'll use a VP8 and Opus but you can also define your own
+	// We'll use a VP9 and Opus but you can also define your own
 	if err := me.RegisterCodec(webrtc.RTPCodecParameters{
-		RTPCodecCapability: webrtc.RTPCodecCapability{MimeType: webrtc.MimeTypeVP8, ClockRate: 90000, Channels: 0, SDPFmtpLine: "", RTCPFeedback: nil},
+		RTPCodecCapability: webrtc.RTPCodecCapability{MimeType: webrtc.MimeTypeVP9, ClockRate: 90000, Channels: 0, SDPFmtpLine: "", RTCPFeedback: nil},
 		PayloadType:        96,
 	}, webrtc.RTPCodecTypeVideo); err != nil {
 		return nil, err

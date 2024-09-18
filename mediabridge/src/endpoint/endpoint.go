@@ -31,8 +31,8 @@ import (
 	logging "github.com/adalkiran/go-colorful-logging"
 	"github.com/pion/rtcp"
 	"github.com/pion/rtp/codecs"
-	"github.com/pion/webrtc/v3"
-	"github.com/pion/webrtc/v3/pkg/media/samplebuilder"
+	"github.com/pion/webrtc/v4"
+	"github.com/pion/webrtc/v4/pkg/media/samplebuilder"
 )
 
 type Endpoint struct {
@@ -118,6 +118,10 @@ func (e *Endpoint) DoSignaling(endpointManager *EndpointManager) (*SignalingResu
 		go func() {
 			ticker := time.NewTicker(time.Second * 3)
 			for range ticker.C {
+				connectionState := peerConnection.ConnectionState()
+				if connectionState == webrtc.PeerConnectionStateFailed || connectionState == webrtc.PeerConnectionStateDisconnected || connectionState == webrtc.PeerConnectionStateClosed {
+					break
+				}
 				errSend := peerConnection.WriteRTCP([]rtcp.Packet{&rtcp.PictureLossIndication{MediaSSRC: uint32(track.SSRC())}})
 				if errSend != nil {
 					fmt.Println(errSend)
@@ -129,9 +133,9 @@ func (e *Endpoint) DoSignaling(endpointManager *EndpointManager) (*SignalingResu
 		if strings.EqualFold(codec.MimeType, webrtc.MimeTypeOpus) {
 			fmt.Println("Got Opus track, saving to disk as output.opus (48 kHz, 2 channels)")
 			//saveToDisk(oggFile, track)
-		} else if strings.EqualFold(codec.MimeType, webrtc.MimeTypeVP8) {
-			fmt.Println("Got VP8 track, starting depacketizer...")
-			go e.processVP8Track(track, endpointManager)
+		} else if strings.EqualFold(codec.MimeType, webrtc.MimeTypeVP9) {
+			fmt.Println("Got VP9 track, starting depacketizer...")
+			go e.processVP9Track(track, endpointManager)
 			//saveToDisk(ivfFile, track)
 		}
 	})
@@ -187,11 +191,11 @@ func (e *Endpoint) AcceptSDPOfferAnswer(sdpOfferAnswer string) error {
 	})
 }
 
-func (e *Endpoint) processVP8Track(track *webrtc.TrackRemote, endpointManager *EndpointManager) {
+func (e *Endpoint) processVP9Track(track *webrtc.TrackRemote, endpointManager *EndpointManager) {
 	//See: https://gist.github.com/mholbergerNIMBL/e5d17491a8cad621d53c6ed1b505ab7a#file-main-go-L6
 	//See: https://stackoverflow.com/questions/68859120/how-to-convert-vp8-interframe-into-image-with-pion-webrtc
-	sampleBuilder := samplebuilder.New(20000, &codecs.VP8Packet{}, track.Codec().ClockRate)
-	decoder := vpx.DecoderIfaceVP8()
+	sampleBuilder := samplebuilder.New(20000, &codecs.VP9Packet{}, track.Codec().ClockRate)
+	decoder := vpx.DecoderIfaceVP9()
 	ctx := vpx.NewCodecCtx()
 
 	err := vpx.Error(vpx.CodecDecInitVer(ctx, decoder, nil, 0, vpx.DecoderABIVersion))
@@ -214,7 +218,7 @@ func (e *Endpoint) processVP8Track(track *webrtc.TrackRemote, endpointManager *E
 		}
 		rtpPacket, _, err := track.ReadRTP()
 		if err != nil {
-			if err.Error() == "EOF" {
+			if err.Error() == "EOF" || strings.Contains(err.Error(), "closed") {
 				return
 			}
 			panic(err)
@@ -243,7 +247,6 @@ func (e *Endpoint) processVP8Track(track *webrtc.TrackRemote, endpointManager *E
 
 			buffer := new(bytes.Buffer)
 			if err = jpeg.Encode(buffer, img.ImageYCbCr(), nil); err != nil {
-				//  panic(err)
 				fmt.Printf("jpeg Encode Error: %s\r\n", err)
 				continue
 			}
